@@ -10,24 +10,6 @@ import UIKit
 import SwiftUI
 
 // MARK: - UIKit ViewController
-
-/// UIKit wrapper for Glide verification
-///
-/// Example:
-/// ```swift
-/// let vc = GlideVerificationViewController(
-///     headerText: "My App",
-///     headerImage: UIImage(named: "logo")
-/// ) { result in
-///     switch result {
-///     case .success(let data):
-///         print("Code: \(data.code), State: \(data.state)")
-///     case .failure(let error):
-///         print("Error: \(error)")
-///     }
-/// }
-/// present(vc, animated: true)
-/// ```
 public class GlideVerificationViewController: UIViewController {
     
     private let headerText: String?
@@ -54,8 +36,7 @@ public class GlideVerificationViewController: UIViewController {
     private func embedSwiftUIView() {
         let swiftUIView = GlideVerificationView(
             headerText: headerText,
-            headerImage: headerImage,
-            onDismiss: { [weak self] in self?.dismiss(animated: true) }
+            headerImage: headerImage
         )
         
         let hostingController = UIHostingController(rootView: swiftUIView)
@@ -75,25 +56,6 @@ public class GlideVerificationViewController: UIViewController {
 }
 
 // MARK: - SwiftUI View
-
-/// SwiftUI view for Glide verification
-///
-/// Example:
-/// ```swift
-/// GlideVerificationView(
-///     headerText: "My App",
-///     headerImage: UIImage(named: "logo")
-/// ) { result in
-///     switch result {
-///     case .success(let data):
-///         print("Code: \(data.code), State: \(data.state)")
-///     case .failure(let error):
-///         print("Error: \(error)")
-///     }
-/// } onDismiss: {
-///     // Handle dismiss
-/// }
-/// ```
 public struct GlideVerificationView: View {
     
     private let headerText: String?
@@ -102,12 +64,10 @@ public struct GlideVerificationView: View {
     
     public init(
         headerText: String? = nil,
-        headerImage: UIImage? = nil,
-        onDismiss: (() -> Void)? = nil
+        headerImage: UIImage? = nil
     ) {
         self.headerText = headerText
         self.headerImage = headerImage
-        self.onDismiss = onDismiss
     }
     
     public var body: some View {
@@ -126,17 +86,4 @@ public struct GlideVerificationView: View {
         }
     }
 }
-
-// MARK: - Preview
-
-#if DEBUG
-struct GlideVerificationView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            GlideVerificationView(headerText: "My App")
-            GlideVerificationView()
-        }
-    }
-}
-#endif
 #endif
