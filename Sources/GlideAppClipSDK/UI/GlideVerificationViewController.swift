@@ -14,13 +14,16 @@ public class GlideVerificationViewController: UIViewController {
     
     private let headerText: String?
     private let headerImage: UIImage?
+    private let onDismiss: (() -> Void)?
     
     public init(
         headerText: String? = nil,
-        headerImage: UIImage? = nil
+        headerImage: UIImage? = nil,
+        onDismiss: (() -> Void)? = nil
     ) {
         self.headerText = headerText
         self.headerImage = headerImage
+        self.onDismiss = onDismiss
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -36,7 +39,8 @@ public class GlideVerificationViewController: UIViewController {
     private func embedSwiftUIView() {
         let swiftUIView = GlideVerificationView(
             headerText: headerText,
-            headerImage: headerImage
+            headerImage: headerImage,
+            onDismiss: onDismiss ?? { [weak self] in self?.dismiss(animated: true) }
         )
         
         let hostingController = UIHostingController(rootView: swiftUIView)
@@ -64,10 +68,12 @@ public struct GlideVerificationView: View {
     
     public init(
         headerText: String? = nil,
-        headerImage: UIImage? = nil
+        headerImage: UIImage? = nil,
+        onDismiss: (() -> Void)? = nil
     ) {
         self.headerText = headerText
         self.headerImage = headerImage
+        self.onDismiss = onDismiss
     }
     
     public var body: some View {
