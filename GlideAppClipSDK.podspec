@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage          = 'https://github.com/GlideIdentity/glide-ios-appclip-sdk'
   s.license           = { type: 'MIT' }
   s.author            = { 'Glide' => 'amiravisar89@gmail.com' }
-  s.documentation_url = 'https://github.com/GlideIdentity/glide-ios-appclip-sdk/blob/master/README.md'
+  s.documentation_url = 'https://github.com/GlideIdentity/glide-ios-appclip-sdk/master/README.md'
 
   s.ios.deployment_target  = '15.0'
   s.swift_version          = '5.9'
