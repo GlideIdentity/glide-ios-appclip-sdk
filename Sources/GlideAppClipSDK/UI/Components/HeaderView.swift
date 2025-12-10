@@ -1,11 +1,12 @@
 //
 //  HeaderView.swift
-//  GlideSwiftSDK
+//  GlideAppClipSDK
 //
 //  Created by amir avisar on 03/12/2025.
 //
 
-#if canImport(SwiftUI)
+#if canImport(UIKit) && canImport(SwiftUI)
+import UIKit
 import SwiftUI
 
 /// Header view displaying custom image and text

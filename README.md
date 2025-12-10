@@ -2,13 +2,37 @@
 
 ## Introduction
 
-`GlideAppClipSDK` is our SDK for integrating Glide verification UI components into iOS App Clips and lightweight authentication flows. This SDK provides pre-built UI components optimized for App Clip experiences.
+`GlideAppClipSDK` is a lightweight SDK for integrating Glide verification UI components into iOS App Clips. This SDK provides pre-built UI components optimized for App Clip experiences with automatic entitlement validation.
+
+## Entitlement Validation
+
+The SDK automatically validates the **com.apple.CommCenter.fine-grained** entitlement by attempting to access the CoreTelephony `CTSubscriber.carrierToken` API. This entitlement is required for accessing subscriber information.
+
+### How It Works
+
+1. On app launch, the SDK attempts to access `CTSubscriber().carrierToken`
+2. If the token is accessible (not nil), the entitlement is present
+3. If the token is nil, the entitlement is missing or not properly configured
+4. The UI displays a status badge (green for valid, red for missing)
+
+### Adding the Entitlement
+
+Add the following to your App Clip's `.entitlements` file:
+
+```xml
+<key>com.apple.CommCenter.fine-grained</key>
+<array>
+    <string>spi</string>
+</array>
+```
+
+**Note**: This entitlement may require approval from Apple for production use.
 
 ## Installation
 
 ### Swift Package Manager
 
-The [Swift Package Manager](https://swift.org/package-manager/) is a tool for managing the distribution of Swift code. To use GlideAppClipSDK with Swift Package Manager, add it to `dependencies` in your `Package.swift`
+Add GlideAppClipSDK to your `Package.swift`:
 
 ```swift
 dependencies: [
@@ -16,15 +40,12 @@ dependencies: [
 ]
 ```
 
+Or add it via Xcode:
+1. File → Add Package Dependencies
+2. Enter the repository URL
+3. Select your App Clip target
+
 ## Usage
-
-Firstly, import `GlideAppClipSDK`.
-
-```swift
-import GlideAppClipSDK
-```
-
-The SDK provides a ready-to-use verification view that displays a customizable header with image and text. This is ideal for App Clips where you want a quick, streamlined authentication experience.
 
 ### SwiftUI Integration
 
@@ -42,8 +63,6 @@ struct ContentView: View {
 ```
 
 #### Custom Header
-
-You can customize the header with your own text and image:
 
 ```swift
 import SwiftUI
@@ -66,15 +85,13 @@ import SwiftUI
 import GlideAppClipSDK
 
 struct ContentView: View {
-    @Environment(\.dismiss) var dismiss
-    
     var body: some View {
         GlideVerificationView(
             headerText: "Verify Your Identity",
             headerImage: UIImage(named: "app-icon")
         ) {
             // Handle dismiss
-            dismiss()
+            print("User dismissed")
         }
     }
 }
@@ -82,33 +99,28 @@ struct ContentView: View {
 
 ### UIKit Integration
 
-For UIKit-based apps or App Clips, use `GlideVerificationViewController`:
-
 ```swift
 import UIKit
 import GlideAppClipSDK
 
 class AppClipViewController: UIViewController {
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let glideVC = GlideVerificationViewController(
             headerText: "My App",
             headerImage: UIImage(named: "logo")
-        )
+        ) {
+            // Handle dismiss
+            print("User dismissed")
+        }
         
         present(glideVC, animated: true)
     }
 }
 ```
 
-### App Clip Integration
-
-To use GlideAppClipSDK in your App Clip:
-
-1. Add the package dependency to your App Clip target in Xcode
-2. Import and use the verification view in your App Clip's entry point:
+### App Clip Integration Example
 
 ```swift
 import SwiftUI
@@ -119,7 +131,7 @@ struct MyAppClip: App {
     var body: some Scene {
         WindowGroup {
             GlideVerificationView(
-                headerText: "Quick Verification",
+                headerText: "Quick Access",
                 headerImage: UIImage(named: "clip-icon")
             )
         }
@@ -127,47 +139,41 @@ struct MyAppClip: App {
 }
 ```
 
-### Customization
+## UI Features
 
-The `GlideVerificationView` accepts the following parameters:
+The verification view includes:
 
-- **`headerText`** (optional): Custom text to display in the header. Defaults to "Glide" if not provided.
-- **`headerImage`** (optional): Custom image to display in the header. Defaults to a shield icon if not provided.
-- **`onDismiss`** (optional): Closure called when the user taps the close button.
+- **Loading State**: Shows a spinner while checking entitlements
+- **Status Badge**: Displays entitlement status (Valid/Missing) with color-coded indicator
+- **Custom Header**: Configurable text and image
+- **Error Display**: Shows detailed error messages if entitlement validation fails
+- **Close Button**: Navigation bar button to dismiss the view
 
-### Example: App Clip with Custom Branding
+### Customization Options
 
-```swift
-import SwiftUI
-import GlideAppClipSDK
-
-@main
-struct RestaurantAppClip: App {
-    var body: some Scene {
-        WindowGroup {
-            GlideVerificationView(
-                headerText: "Restaurant Reservations",
-                headerImage: UIImage(named: "restaurant-logo")
-            ) {
-                // User dismissed the view
-                print("User closed verification")
-            }
-        }
-    }
-}
-```
+- **`headerText`** (String?, optional): Custom text for the header. Defaults to "Glide"
+- **`headerImage`** (UIImage?, optional): Custom image for the header. Defaults to shield icon
+- **`onDismiss`** (() -> Void, optional): Callback when user taps close button
 
 ## Requirements
 
 - iOS 15.0+
 - Swift 5.9+
 - Xcode 15.0+
+- CoreTelephony framework (automatically linked)
+
+## Platform Support
+
+- ✅ iOS Device (with SIM card for full validation)
+- ✅ iOS Simulator (validation always passes)
+- ❌ macOS (not supported)
 
 ## Notes
 
-- This SDK is designed specifically for App Clips and lightweight verification flows
-- The UI is optimized for quick authentication without complex phone number input
-- For full-featured authentication in main apps, consider using `GlideSwiftSDK`
+- Designed specifically for iOS App Clips
+- Entitlement validation requires a real device with SIM card for accurate results
+- On simulator, entitlement check automatically passes for development
+- The CommCenter entitlement may require special approval from Apple
 
 ## License
 
